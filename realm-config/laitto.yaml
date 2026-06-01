@@ -1,0 +1,36 @@
+realm: laitto
+enabled: true
+displayName: Laitto
+loginTheme: laitto
+resetPasswordAllowed: true
+rememberMe: true
+registrationAllowed: false
+accessTokenLifespan: 300
+ssoSessionMaxLifespan: 36000
+
+clients:
+  - clientId: laitto-management
+    name: Laitto UI
+    enabled: true
+    publicClient: true
+    standardFlowEnabled: true
+    implicitFlowEnabled: false
+    directAccessGrantsEnabled: false
+    serviceAccountsEnabled: false
+    redirectUris:
+      - "http://localhost:5173/*"
+      - "http://localhost:4173/*"
+    webOrigins:
+      - "http://localhost:5173"
+      - "http://localhost:4173"
+    attributes:
+      post.logout.redirect.uris: "http://localhost:5173/*##http://localhost:4173/*"
+
+  - clientId: laitto-services
+    name: Laitto Backend Services
+    enabled: true
+    publicClient: false
+    standardFlowEnabled: false
+    directAccessGrantsEnabled: false
+    serviceAccountsEnabled: false
+    secret: "change-me-backend-secret"
