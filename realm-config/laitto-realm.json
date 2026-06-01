@@ -1,0 +1,49 @@
+{
+  "realm": "laitto",
+  "enabled": true,
+  "displayName": "Laitto",
+  "loginTheme": "laitto",
+  "registrationAllowed": false,
+  "resetPasswordAllowed": true,
+  "rememberMe": true,
+  "sslRequired": "none",
+  "accessTokenLifespan": 300,
+  "ssoSessionMaxLifespan": 36000,
+  "clients": [
+    {
+      "clientId": "laitto-management",
+      "enabled": true,
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "redirectUris": [
+        "http://localhost:5173/*",
+        "http://localhost:4173/*"
+      ],
+      "webOrigins": [
+        "http://localhost:5173",
+        "http://localhost:4173"
+      ],
+      "attributes": {
+        "post.logout.redirect.uris": "http://localhost:5173/*"
+      }
+    }
+  ],
+  "users": [
+    {
+      "username": "brewer",
+      "email": "brewer@laitto.local",
+      "firstName": "Test",
+      "lastName": "Brewer",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "brewer",
+          "temporary": false
+        }
+      ]
+    }
+  ]
+}
