@@ -2,6 +2,7 @@ realm: laitto
 enabled: true
 displayName: Laitto
 loginTheme: laitto
+organizationsEnabled: true
 resetPasswordAllowed: true
 rememberMe: true
 registrationAllowed: false
