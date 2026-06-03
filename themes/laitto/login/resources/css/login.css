@@ -37,7 +37,7 @@
 }
 
 /* ── Page background ─────────────────────────────────────────────────────── */
-.login-pf body {
+#keycloak-bg {
   background: radial-gradient(1200px 600px at 50% -10%, #11202e 0%, var(--bg) 60%) fixed !important;
   color: var(--text);
 }
@@ -48,8 +48,8 @@
   letter-spacing: 0.02em;
 }
 
-/* ── Card ────────────────────────────────────────────────────────────────── */
-.card-pf {
+/* ── Card (PatternFly v5 login main) ─────────────────────────────────────── */
+.pf-v5-c-login__main {
   background: var(--surface) !important;
   border: 1px solid var(--border) !important;
   border-radius: 14px !important;
