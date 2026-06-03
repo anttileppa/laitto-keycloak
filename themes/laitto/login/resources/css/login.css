@@ -1,13 +1,22 @@
-/* ─── Design tokens (match laitto-herms-ui theme) ─────────────────────────── */
+/*
+ * Laitto login overlay.
+ *
+ * Light recolor on top of keycloak.v2 (PatternFly v5). We do NOT replace the
+ * stock templates/markup — this only restyles them into the laitto dark palette,
+ * so every login sub-page (forgot password, OTP, etc.) stays styled automatically.
+ *
+ * Palette mirrors laitto-herms-ui design tokens.
+ */
+
 :root {
   --accent:      #e08a3c;
-  --accent-soft: rgba(224, 138, 60, 0.12);
-  --accent-line: rgba(224, 138, 60, 0.30);
+  --accent-hi:   #f0a25a;
+  --accent-soft: rgba(224, 138, 60, 0.18);
   --accent-ink:  #1a0800;
 
+  --bg:        #090c12;
   --surface:   #111720;
   --surface-2: #151e2c;
-  --surface-3: #1a2438;
 
   --border:   rgba(255, 255, 255, 0.07);
   --border-2: rgba(255, 255, 255, 0.12);
@@ -17,249 +26,112 @@
   --text-mid: #8895aa;
   --text-dim: #4e5b6e;
 
-  --red:      #e05252;
-  --red-soft: rgba(224, 82, 82, 0.12);
+  /* keycloak.v2 theming hooks */
+  --keycloak-card-top-color: var(--accent);
 
-  --radius:    12px;
-  --radius-sm: 8px;
-
-  --sans: 'Inter', system-ui, -apple-system, sans-serif;
-  --mono: 'JetBrains Mono', 'Menlo', monospace;
+  /* PatternFly v5 globals — recolor primary + links across the login pages */
+  --pf-v5-global--primary-color--100: var(--accent);
+  --pf-v5-global--primary-color--200: #c5742f;
+  --pf-v5-global--link--Color: var(--accent);
+  --pf-v5-global--link--Color--hover: var(--accent-hi);
 }
 
-/* ─── Reset ────────────────────────────────────────────────────────────────── */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-/* ─── Page ─────────────────────────────────────────────────────────────────── */
-html, body {
-  height: 100%;
-  background: #090c12;
-  font-family: var(--sans);
-  color: var(--text);
-  -webkit-font-smoothing: antialiased;
-}
-
-.l-page {
-  min-height: 100dvh;
-  display: grid;
-  place-items: center;
-  padding: 24px;
-}
-
-/* ─── Card ─────────────────────────────────────────────────────────────────── */
-.l-card {
-  width: 100%;
-  max-width: 400px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 28px 26px 30px;
-}
-
-/* ─── Brand header ─────────────────────────────────────────────────────────── */
-.l-brand {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 14px;
-  margin-bottom: 26px;
-  text-align: center;
-}
-
-.l-mark {
-  width: 52px;
-  height: 52px;
-  border-radius: 14px;
-  background: var(--accent);
-  color: var(--accent-ink);
-  display: grid;
-  place-items: center;
-  font-weight: 800;
-  font-size: 26px;
-  font-family: var(--mono);
-}
-
-.l-brand-name {
-  font-weight: 700;
-  font-size: 22px;
-  color: var(--text-hi);
-  letter-spacing: -0.01em;
-  margin-top: 4px;
-}
-
-.l-brand-sub {
-  font-size: 13.5px;
-  color: var(--text-mid);
-  margin-top: 4px;
-}
-
-/* ─── Alert (error / info / warning / success) ─────────────────────────────── */
-.l-alert {
-  border-radius: var(--radius-sm);
-  padding: 11px 14px;
-  font-size: 13px;
-  margin-bottom: 18px;
-  line-height: 1.5;
-}
-
-.l-alert--error   { background: var(--red-soft); border: 1px solid rgba(224,82,82,0.25); color: #f08080; }
-.l-alert--warning { background: rgba(242,169,59,0.1); border: 1px solid rgba(242,169,59,0.25); color: #f2b860; }
-.l-alert--info    { background: rgba(78,162,255,0.08); border: 1px solid rgba(78,162,255,0.2); color: #7ab8ff; }
-.l-alert--success { background: rgba(76,175,106,0.1); border: 1px solid rgba(76,175,106,0.25); color: #70d48a; }
-
-/* ─── Form ─────────────────────────────────────────────────────────────────── */
-.l-form {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-/* ─── Field ────────────────────────────────────────────────────────────────── */
-.l-field {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.l-field-row {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-}
-
-.l-label {
-  font-size: 10.5px;
-  font-weight: 600;
-  color: var(--text-dim);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-}
-
-.l-input {
-  width: 100%;
-  background: var(--surface-2);
-  border: 1px solid var(--border-2);
-  border-radius: var(--radius-sm);
-  color: var(--text-hi);
-  font-family: var(--sans);
-  font-size: 14px;
-  padding: 12px 13px;
-  outline: none;
-  transition: border-color 0.15s;
-}
-
-.l-input:focus {
-  border-color: var(--accent-line);
-  box-shadow: 0 0 0 3px var(--accent-soft);
-}
-
-.l-input--error {
-  border-color: rgba(224, 82, 82, 0.5);
-}
-
-.l-input--error:focus {
-  border-color: var(--red);
-  box-shadow: 0 0 0 3px var(--red-soft);
-}
-
-.l-field-error {
-  font-size: 12px;
-  color: var(--red);
-  margin-top: 2px;
-}
-
-/* ─── Remember-me checkbox ─────────────────────────────────────────────────── */
-.l-checkbox-label {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  cursor: pointer;
-  user-select: none;
-}
-
-.l-checkbox-input {
-  position: absolute;
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-.l-checkbox-box {
-  width: 20px;
-  height: 20px;
-  border-radius: 6px;
-  flex-shrink: 0;
-  background: var(--surface-2);
-  border: 1px solid var(--border-2);
-  transition: background 0.15s, border-color 0.15s;
-  position: relative;
-}
-
-.l-checkbox-input:checked + .l-checkbox-box {
-  background: var(--accent);
-  border-color: var(--accent);
-}
-
-.l-checkbox-input:checked + .l-checkbox-box::after {
-  content: '';
-  position: absolute;
-  inset: 4px 4px 5px 5px;
-  border: 2px solid var(--accent-ink);
-  border-top: none;
-  border-right: none;
-  transform: rotate(-45deg);
-}
-
-.l-checkbox-text {
-  font-size: 13px;
+/* ── Page background ─────────────────────────────────────────────────────── */
+.login-pf body {
+  background: radial-gradient(1200px 600px at 50% -10%, #11202e 0%, var(--bg) 60%) fixed !important;
   color: var(--text);
 }
 
-/* ─── Primary button ───────────────────────────────────────────────────────── */
-.l-btn-primary {
-  width: 100%;
-  height: 46px;
-  border-radius: var(--radius-sm);
-  background: var(--accent);
-  border: 1px solid var(--accent);
-  color: var(--accent-ink);
-  font-family: var(--sans);
-  font-size: 14.5px;
-  font-weight: 700;
-  cursor: pointer;
-  margin-top: 4px;
-  transition: opacity 0.15s;
+/* ── Brand title (realm display name in the header) ──────────────────────── */
+#kc-header-wrapper {
+  color: var(--text-hi);
+  letter-spacing: 0.02em;
 }
 
-.l-btn-primary:hover  { opacity: 0.92; }
-.l-btn-primary:active { opacity: 0.82; }
+/* ── Card ────────────────────────────────────────────────────────────────── */
+.card-pf {
+  background: var(--surface) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 14px !important;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55) !important;
+  color: var(--text);
+}
 
-/* ─── Links ────────────────────────────────────────────────────────────────── */
-.l-link {
+/* ── Headings / labels / helper text ─────────────────────────────────────── */
+#kc-page-title,
+.pf-v5-c-title,
+.pf-v5-c-form__label,
+.pf-v5-c-form__label-text {
+  color: var(--text-hi) !important;
+}
+
+.pf-v5-c-form__helper-text,
+#kc-info-message,
+.instruction {
+  color: var(--text-mid) !important;
+}
+
+/* ── Inputs ──────────────────────────────────────────────────────────────── */
+.pf-v5-c-form-control,
+.pf-v5-c-form-control > input,
+input.pf-v5-c-form-control {
+  background: var(--surface-2) !important;
+  border: 1px solid var(--border-2) !important;
+  border-radius: 9px !important;
+  color: var(--text-hi) !important;
+}
+
+.pf-v5-c-form-control::placeholder,
+.pf-v5-c-form-control > input::placeholder {
+  color: var(--text-dim) !important;
+}
+
+.pf-v5-c-form-control:focus-within,
+.pf-v5-c-form-control:focus,
+input.pf-v5-c-form-control:focus {
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 3px var(--accent-soft) !important;
+  outline: none !important;
+}
+
+/* ── Primary button ──────────────────────────────────────────────────────── */
+.pf-v5-c-button.pf-m-primary {
+  background: var(--accent) !important;
+  color: var(--accent-ink) !important;
+  border: 1px solid var(--accent) !important;
+  border-radius: 10px !important;
+  font-weight: 700;
+}
+
+.pf-v5-c-button.pf-m-primary:hover,
+.pf-v5-c-button.pf-m-primary:focus {
+  background: var(--accent-hi) !important;
+  border-color: var(--accent-hi) !important;
+}
+
+/* ── Secondary / link buttons ────────────────────────────────────────────── */
+.pf-v5-c-button.pf-m-secondary {
+  background: var(--surface-2) !important;
+  color: var(--text-hi) !important;
+  border: 1px solid var(--border-2) !important;
+  border-radius: 10px !important;
+}
+
+a {
   color: var(--accent);
-  text-decoration: none;
-  font-size: 13px;
-  font-weight: 500;
+}
+a:hover {
+  color: var(--accent-hi);
 }
 
-.l-link:hover { text-decoration: underline; }
-
-.l-link--sm {
-  font-size: 11.5px;
+/* ── Checkbox (remember me) ──────────────────────────────────────────────── */
+.pf-v5-c-check__label {
+  color: var(--text);
 }
 
-/* ─── Info row (register link) ─────────────────────────────────────────────── */
-.l-info {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  margin-top: 18px;
-  padding-top: 18px;
-  border-top: 1px solid var(--border);
-}
-
-.l-info-text {
-  font-size: 13px;
-  color: var(--text-mid);
+/* ── Alerts: tint surfaces to fit the dark theme ─────────────────────────── */
+.pf-v5-c-alert {
+  background: var(--surface-2) !important;
+  border: 1px solid var(--border-2) !important;
+  color: var(--text-hi) !important;
 }
