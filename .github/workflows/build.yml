@@ -45,3 +45,8 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Trigger deploy
+        env:
+          GH_TOKEN: ${{ secrets.DEPLOY_DISPATCH_PAT }}
+        run: gh api repos/anttileppa/laitto-charts/dispatches -f event_type=deploy
