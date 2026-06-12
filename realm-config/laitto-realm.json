@@ -27,6 +27,21 @@
       "attributes": {
         "post.logout.redirect.uris": "http://localhost:5173/*"
       }
+    },
+    {
+      "clientId": "laitto-mobile",
+      "description": "Laitto mobile app (expo-auth-session, OIDC auth-code + PKCE over the laittomobile:// app scheme)",
+      "enabled": true,
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "redirectUris": [
+        "laittomobile://*"
+      ],
+      "attributes": {
+        "pkce.code.challenge.method": "S256",
+        "post.logout.redirect.uris": "laittomobile://*"
+      }
     }
   ],
   "users": [
