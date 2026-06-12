@@ -30,17 +30,17 @@
     },
     {
       "clientId": "laitto-mobile",
-      "description": "Laitto mobile app (expo-auth-session, OIDC auth-code + PKCE over the laittomobile:// app scheme)",
+      "description": "Laitto mobile app (expo-auth-session, OIDC auth-code + PKCE over the fi.laitto.mobile:// app scheme)",
       "enabled": true,
       "publicClient": true,
       "standardFlowEnabled": true,
       "directAccessGrantsEnabled": false,
       "redirectUris": [
-        "laittomobile://*"
+        "fi.laitto.mobile://*"
       ],
       "attributes": {
         "pkce.code.challenge.method": "S256",
-        "post.logout.redirect.uris": "laittomobile://*"
+        "post.logout.redirect.uris": "fi.laitto.mobile://*"
       }
     }
   ],
