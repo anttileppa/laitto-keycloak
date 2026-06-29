@@ -1,0 +1,43 @@
+version: 1
+projectKey: laitto
+
+routing:
+  sourceRepos:
+    - anttileppa/laitto
+  targetRepo: anttileppa/laitto-keycloak
+
+automation:
+  enabledTaskTypes:
+    - docs
+    - small-bugfix
+    - focused-feature
+  maxChangedFiles: 12
+  maxDiffLines: 500
+  timeoutMinutes: 40
+  allowPaths:
+    - realm-config/**
+    - themes/**
+    - Dockerfile
+    - docker-compose.yml
+    - README.md
+  denyPaths:
+    - .github/workflows/**
+
+quality:
+  requiredChecks:
+    - docker compose config
+  minConfidence: 0.75
+  requireDraftPr: true
+
+triage:
+  skipLabels:
+    - blocked
+    - do-not-automate
+  escalateLabels:
+    - security-sensitive
+    - architecture
+    - cross-repo
+
+handoff:
+  onEscalate: comment
+  onMissingInfo: comment
