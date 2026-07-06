@@ -5,7 +5,7 @@ loginTheme: laitto
 organizationsEnabled: true
 resetPasswordAllowed: true
 rememberMe: true
-registrationAllowed: false
+registrationAllowed: true
 accessTokenLifespan: 300
 ssoSessionMaxLifespan: 36000
 
