@@ -50,3 +50,17 @@ clients:
     directAccessGrantsEnabled: false
     serviceAccountsEnabled: false
     secret: "change-me-backend-secret"
+
+  # Headless logins for the stress rig's throwaway users (#106): the k6 setup/teardown scripts
+  # authenticate with the password grant — no browser flow. Confidential so the grant needs the
+  # secret on top of the user password; disabled flows keep it single-purpose.
+  - clientId: laitto-stress
+    name: Laitto Stress Rig
+    description: Direct-grant client for the self-cleaning stress tests (laitto#106)
+    enabled: true
+    publicClient: false
+    standardFlowEnabled: false
+    implicitFlowEnabled: false
+    directAccessGrantsEnabled: true
+    serviceAccountsEnabled: false
+    secret: "change-me-stress-secret"
