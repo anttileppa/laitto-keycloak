@@ -6,8 +6,14 @@ organizationsEnabled: true
 resetPasswordAllowed: true
 rememberMe: true
 registrationAllowed: true
+# Session lifetimes are sized for a brew day, not an office app (laitto#151). A brewer puts the
+# phone down for a whole mash rest, so Keycloak's default 30-minute idle timeout expired the SSO
+# session mid-brew and took the refresh token with it. Keep in step with the production copy in
+# laitto-charts (charts/laitto/templates/keycloak-config-configmap.yaml) — the two have drifted
+# before; this file is the local docker-compose realm, that one is what production applies.
 accessTokenLifespan: 300
-ssoSessionMaxLifespan: 36000
+ssoSessionIdleTimeout: 43200   # 12 h
+ssoSessionMaxLifespan: 86400   # 24 h
 
 clients:
   - clientId: laitto-management

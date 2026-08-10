@@ -8,7 +8,8 @@
   "rememberMe": true,
   "sslRequired": "none",
   "accessTokenLifespan": 300,
-  "ssoSessionMaxLifespan": 36000,
+  "ssoSessionIdleTimeout": 43200,
+  "ssoSessionMaxLifespan": 86400,
   "clients": [
     {
       "clientId": "laitto-management",
