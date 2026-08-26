@@ -37,6 +37,18 @@
 }
 
 /* ── Page background ─────────────────────────────────────────────────────── */
+/* #keycloak-bg only covers its own box, so on a form taller than the viewport (the register page
+   with the brewery field) the page bottom fell through to the browser's white default. Paint the
+   root elements too, so there is no seam however long the form gets. */
+html,
+body {
+  background: var(--bg) !important;
+}
+
+#keycloak-bg {
+  min-height: 100vh;
+}
+
 #keycloak-bg {
   background: radial-gradient(1200px 600px at 50% -10%, #11202e 0%, var(--bg) 60%) fixed !important;
   color: var(--text);
