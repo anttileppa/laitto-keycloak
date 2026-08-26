@@ -6,6 +6,10 @@ organizationsEnabled: true
 resetPasswordAllowed: true
 rememberMe: true
 registrationAllowed: true
+# Local dev only: the compose stack is plain HTTP on localhost, and Keycloak's default
+# (sslRequired: external) answers "HTTPS required" to every login and register page. Production
+# deliberately leaves this at the default — it sits behind HTTPS.
+sslRequired: none
 # Session lifetimes are sized for a brew day, not an office app (laitto#151). A brewer puts the
 # phone down for a whole mash rest, so Keycloak's default 30-minute idle timeout expired the SSO
 # session mid-brew and took the refresh token with it. Keep in step with the production copy in
@@ -14,6 +18,193 @@ registrationAllowed: true
 accessTokenLifespan: 300
 ssoSessionIdleTimeout: 43200   # 12 h
 ssoSessionMaxLifespan: 86400   # 24 h
+
+# ── Email ──────────────────────────────────────────────────────────────────────
+# Local dev sends to Mailpit (docker-compose), so account verification and password reset work
+# without real credentials and without anything leaving the machine — read the mail at
+# http://localhost:8025. Production points at OCI Email Delivery instead; see the chart's
+# keycloak-config-configmap.yaml.
+verifyEmail: true
+smtpServer:
+  host: mailpit
+  port: "1025"
+  from: noreply@send.laitto.eu
+  fromDisplayName: Laitto
+  replyTo: info@laitto.eu
+  replyToDisplayName: Laitto
+  envelopeFrom: noreply@send.laitto.eu
+  auth: "false"
+  ssl: "false"
+  starttls: "false"
+
+# Local test account. Registration uses email as username, so this one does too.
+users:
+  - username: brewer@laitto.local
+    email: brewer@laitto.local
+    firstName: Test Brewer
+    enabled: true
+    emailVerified: true
+    credentials:
+      - type: password
+        value: brewer
+        temporary: false
+
+# ── Registration form ──────────────────────────────────────────────────────────
+# The brewery is named on the register page itself, so signing up and creating the brewery are one
+# action rather than two forms. `breweryName` is a declarative user-profile attribute: any attribute
+# a *user* may edit is rendered on the registration form, and the order here is the render order —
+# hence breweryName first.
+#
+# Labels resolve from the theme's messages_en.properties (breweryName / breweryNameHelp), so the
+# copy lives with the theme instead of being duplicated here.
+#
+# lastName is admin-edit-only on purpose: that drops it off the register form, and the single
+# "Your name" field (firstName) carries the whole name. laitto-ui's member label already falls back
+# to firstName alone, so nothing downstream breaks.
+registrationEmailAsUsername: true   # email is the username — one less thing to invent and remember
+
+components:
+  org.keycloak.userprofile.UserProfileProvider:
+    - providerId: declarative-user-profile
+      config:
+        kc.user.profile.config:
+          - |
+              {
+                "attributes": [
+                  {
+                    "name": "breweryName",
+                    "displayName": "${breweryName}",
+                    "validations": {
+                      "length": {
+                        "min": 2,
+                        "max": 80
+                      }
+                    },
+                    "required": {
+                      "roles": [
+                        "user"
+                      ]
+                    },
+                    "permissions": {
+                      "view": [
+                        "admin",
+                        "user"
+                      ],
+                      "edit": [
+                        "admin",
+                        "user"
+                      ]
+                    },
+                    "annotations": {
+                      "inputType": "text",
+                      "inputHelperTextAfter": "${breweryNameHelp}"
+                    },
+                    "multivalued": false
+                  },
+                  {
+                    "name": "username",
+                    "displayName": "${username}",
+                    "validations": {
+                      "length": {
+                        "min": 3,
+                        "max": 255
+                      },
+                      "username-prohibited-characters": {},
+                      "up-username-not-idn-homograph": {}
+                    },
+                    "permissions": {
+                      "view": [
+                        "admin",
+                        "user"
+                      ],
+                      "edit": [
+                        "admin",
+                        "user"
+                      ]
+                    },
+                    "multivalued": false
+                  },
+                  {
+                    "name": "email",
+                    "displayName": "${email}",
+                    "validations": {
+                      "email": {},
+                      "length": {
+                        "max": 255
+                      }
+                    },
+                    "required": {
+                      "roles": [
+                        "user"
+                      ]
+                    },
+                    "permissions": {
+                      "view": [
+                        "admin",
+                        "user"
+                      ],
+                      "edit": [
+                        "admin",
+                        "user"
+                      ]
+                    },
+                    "multivalued": false
+                  },
+                  {
+                    "name": "firstName",
+                    "displayName": "${firstName}",
+                    "validations": {
+                      "length": {
+                        "max": 255
+                      },
+                      "person-name-prohibited-characters": {}
+                    },
+                    "required": {
+                      "roles": [
+                        "user"
+                      ]
+                    },
+                    "permissions": {
+                      "view": [
+                        "admin",
+                        "user"
+                      ],
+                      "edit": [
+                        "admin",
+                        "user"
+                      ]
+                    },
+                    "multivalued": false
+                  },
+                  {
+                    "name": "lastName",
+                    "displayName": "${lastName}",
+                    "validations": {
+                      "length": {
+                        "max": 255
+                      },
+                      "person-name-prohibited-characters": {}
+                    },
+                    "permissions": {
+                      "view": [
+                        "admin",
+                        "user"
+                      ],
+                      "edit": [
+                        "admin"
+                      ]
+                    },
+                    "multivalued": false
+                  }
+                ],
+                "groups": [
+                  {
+                    "name": "user-metadata",
+                    "displayHeader": "User metadata",
+                    "displayDescription": "Attributes, which refer to user metadata"
+                  }
+                ]
+              }
 
 clients:
   - clientId: laitto-management
@@ -33,6 +224,21 @@ clients:
     attributes:
       post.logout.redirect.uris: "http://localhost:5173/*##http://localhost:4173/*"
 
+    protocolMappers:
+      # Carries the brewery name typed on the register page into the token, so the app can create
+      # the brewery on first sign-in without asking for it a second time. Cleared from the user by
+      # the backend once the brewery exists, so it cannot resurrect a phantom brewery later.
+      - name: brewery-name
+        protocol: openid-connect
+        protocolMapper: oidc-usermodel-attribute-mapper
+        consentRequired: false
+        config:
+          user.attribute: breweryName
+          claim.name: brewery_name
+          jsonType.label: String
+          id.token.claim: "true"
+          access.token.claim: "true"
+          userinfo.token.claim: "true"
   - clientId: laitto-mobile
     name: Laitto Mobile
     description: Laitto mobile app (expo-auth-session, OIDC auth-code + PKCE over the fi.laitto.mobile:// app scheme)
@@ -48,6 +254,21 @@ clients:
       pkce.code.challenge.method: "S256"
       post.logout.redirect.uris: "fi.laitto.mobile://*"
 
+    protocolMappers:
+      # Carries the brewery name typed on the register page into the token, so the app can create
+      # the brewery on first sign-in without asking for it a second time. Cleared from the user by
+      # the backend once the brewery exists, so it cannot resurrect a phantom brewery later.
+      - name: brewery-name
+        protocol: openid-connect
+        protocolMapper: oidc-usermodel-attribute-mapper
+        consentRequired: false
+        config:
+          user.attribute: breweryName
+          claim.name: brewery_name
+          jsonType.label: String
+          id.token.claim: "true"
+          access.token.claim: "true"
+          userinfo.token.claim: "true"
   - clientId: laitto-services
     name: Laitto Backend Services
     enabled: true

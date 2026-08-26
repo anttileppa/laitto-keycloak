@@ -1,4 +1,4 @@
-FROM quay.io/keycloak/keycloak:26.6.2
+FROM quay.io/keycloak/keycloak:26.7.2
 
 # Copy custom theme into Keycloak's theme directory
 COPY themes /opt/keycloak/themes
