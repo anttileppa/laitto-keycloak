@@ -55,6 +55,15 @@ users:
 # a *user* may edit is rendered on the registration form, and the order here is the render order —
 # hence breweryName first.
 #
+# It is deliberately NOT `required`. Do not add a required stanza back: Keycloak's built-in
+# VERIFY_PROFILE required action fires at *every* login while the declarative profile is
+# incomplete, so a required breweryName bounces into "Update Account Information" every account
+# that has no value — which is both every account predating this feature *and* every account the
+# backend has successfully onboarded, since clearBreweryNameAttribute wipes the value once the
+# brewery exists. The attribute is a one-shot handoff to the app, not a property of the user.
+# Leaving it blank is a supported path: laitto-ui's BreweryGate falls through to its onboarding
+# form when the brewery_name claim is absent.
+#
 # Labels resolve from the theme's messages_en.properties (breweryName / breweryNameHelp), so the
 # copy lives with the theme instead of being duplicated here.
 #
@@ -79,11 +88,6 @@ components:
                         "min": 2,
                         "max": 80
                       }
-                    },
-                    "required": {
-                      "roles": [
-                        "user"
-                      ]
                     },
                     "permissions": {
                       "view": [
