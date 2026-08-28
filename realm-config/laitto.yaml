@@ -83,6 +83,11 @@ components:
                   {
                     "name": "breweryName",
                     "displayName": "${breweryName}",
+                    "selector": {
+                      "scopes": [
+                        "brewery-signup"
+                      ]
+                    },
                     "validations": {
                       "length": {
                         "min": 2,
@@ -210,9 +215,33 @@ components:
                 ]
               }
 
+# ── Client scopes ──────────────────────────────────────────────────────────────
+# `brewery-signup` gates the breweryName field on the register page (laitto#184). Only the
+# founder sign-up link requests it, so an invited brewer's register page genuinely does not
+# carry the field — they are joining a brewery, not naming one.
+#
+# It MUST stay OPTIONAL and be requested explicitly. Keycloak's selector.scopes matches only
+# scopes present in the `scope` request parameter: making this a *default* client scope does
+# not satisfy the selector, and the field then disappears from founder sign-up too. Verified
+# against 26.7.2.
+#
+# Ordering with the frontends matters and is not symmetric. Requesting a scope the realm does
+# not declare fails the whole authorization request — Keycloak redirects back with
+# `error=invalid_scope` and nobody can sign in. This file must therefore land BEFORE laitto-ui
+# and laitto-mobile start asking for it. The reverse order only degrades the register page.
+clientScopes:
+  - name: brewery-signup
+    description: Requested by the founder sign-up link so the brewery-name field is rendered.
+    protocol: openid-connect
+    attributes:
+      include.in.token.scope: "false"
+      display.on.consent.screen: "false"
+
 clients:
   - clientId: laitto-management
     name: Laitto UI
+    optionalClientScopes:
+      - brewery-signup
     enabled: true
     publicClient: true
     standardFlowEnabled: true
@@ -245,6 +274,8 @@ clients:
           userinfo.token.claim: "true"
   - clientId: laitto-mobile
     name: Laitto Mobile
+    optionalClientScopes:
+      - brewery-signup
     description: Laitto mobile app (expo-auth-session, OIDC auth-code + PKCE over the fi.laitto.mobile:// app scheme)
     enabled: true
     publicClient: true
