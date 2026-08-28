@@ -240,7 +240,16 @@ clientScopes:
 clients:
   - clientId: laitto-management
     name: Laitto UI
+    # keycloak-config-cli REPLACES this list rather than appending to it, so Keycloak's own
+    # defaults must be spelled out. Listing only brewery-signup silently drops `organization` —
+    # which the app requests on every login, and which carries the claim BreweryResolver reads.
+    # The result is `invalid_scope` on sign-in for everyone. Verified against a fresh 26.7.2 realm.
     optionalClientScopes:
+      - address
+      - microprofile-jwt
+      - offline_access
+      - organization
+      - phone
       - brewery-signup
     enabled: true
     publicClient: true
@@ -274,7 +283,16 @@ clients:
           userinfo.token.claim: "true"
   - clientId: laitto-mobile
     name: Laitto Mobile
+    # keycloak-config-cli REPLACES this list rather than appending to it, so Keycloak's own
+    # defaults must be spelled out. Listing only brewery-signup silently drops `organization` —
+    # which the app requests on every login, and which carries the claim BreweryResolver reads.
+    # The result is `invalid_scope` on sign-in for everyone. Verified against a fresh 26.7.2 realm.
     optionalClientScopes:
+      - address
+      - microprofile-jwt
+      - offline_access
+      - organization
+      - phone
       - brewery-signup
     description: Laitto mobile app (expo-auth-session, OIDC auth-code + PKCE over the fi.laitto.mobile:// app scheme)
     enabled: true
