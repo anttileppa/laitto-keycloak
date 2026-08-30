@@ -1,9 +1,13 @@
 name: Build and push Keycloak image
 
+# Runs on a *release tag*, not on every merge to main. Keycloak is part of the `web` release
+# channel (backend + ui + keycloak), cut together — see docs/release-process.md in the umbrella
+# repo. Merging no longer deploys anything (laitto#204); the release tool updates
+# laitto-charts/release.yaml and that push is what deploys.
 on:
   push:
-    branches:
-      - main
+    tags:
+      - '*'
 
 env:
   REGISTRY: ghcr.io
@@ -20,6 +24,18 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # Needed to prove the tag is on main, below.
+          fetch-depth: 0
+
+      - name: Refuse to publish a tag that is not on main
+        # A tag can point anywhere, and this image goes to production.
+        run: |
+          git fetch --quiet origin main
+          if ! git merge-base --is-ancestor "${GITHUB_SHA}" origin/main; then
+            echo "Tag ${GITHUB_REF_NAME} (${GITHUB_SHA}) is not an ancestor of main — refusing to publish."
+            exit 1
+          fi
 
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
@@ -33,10 +49,12 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          # The release tag is the image tag — the named artifact a rollback targets. `latest`
+          # and `main` are gone: nothing publishes them now, and a stale floating tag is how you
+          # deploy last month's build by accident.
           tags: |
+            type=raw,value=${{ github.ref_name }}
             type=sha,prefix=sha-
-            type=raw,value=latest
-            type=raw,value=main
 
       - name: Build and push
         uses: docker/build-push-action@v6
@@ -47,7 +65,3 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
-      - name: Trigger deploy
-        env:
-          GH_TOKEN: ${{ secrets.DEPLOY_DISPATCH_PAT }}
-        run: gh api repos/anttileppa/laitto-charts/dispatches -f event_type=deploy
