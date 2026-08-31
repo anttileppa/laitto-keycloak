@@ -3,6 +3,21 @@ enabled: true
 displayName: Laitto
 loginTheme: laitto
 organizationsEnabled: true
+# ── Languages ──────────────────────────────────────────────────────────────────
+# The login and register pages are the one leg of the sign-up journey the site itself cannot paint,
+# so they speak the same languages as the app (laitto#189). laitto-ui hands the visitor's chosen
+# locale over as `ui_locales`; Keycloak honours it only when the realm declares the locale here, and
+# falls back to defaultLocale otherwise. Keep this list in step with SUPPORTED_LOCALES in
+# laitto-ui/src/atoms/locale.ts, and with the production copy in laitto-charts
+# (charts/laitto/templates/keycloak-config-configmap.yaml).
+#
+# Keycloak ships its own Finnish translations for the stock login screens; the theme's
+# messages_fi.properties only carries the strings we override ourselves (breweryName, doRegister, …).
+internationalizationEnabled: true
+supportedLocales:
+  - en
+  - fi
+defaultLocale: en
 resetPasswordAllowed: true
 rememberMe: true
 registrationAllowed: true
