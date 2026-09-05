@@ -244,6 +244,22 @@ components:
 # not declare fails the whole authorization request — Keycloak redirects back with
 # `error=invalid_scope` and nobody can sign in. This file must therefore land BEFORE laitto-ui
 # and laitto-mobile start asking for it. The reverse order only degrades the register page.
+# Platform-admin role (laitto#210). The first role in the realm: it gates the write side of
+# /v1/system/appVersions, so the mobile version floor can be raised without a deploy.
+#
+# This is Laitto staff, at the realm level — a different axis from what a member may do inside
+# their own brewery (laitto#186). Assigned by hand; nothing self-serves it.
+#
+# Unlike a client's optionalClientScopes, declaring roles here is additive: verified on a fresh
+# 26.7.2 realm that an import naming only laitto-admin leaves default-roles-laitto (composite),
+# offline_access and uma_authorization in place, with the realm's defaultRole still pointing at
+# the composite. So Keycloak's built-ins are deliberately NOT spelled out below — unlike the
+# client scope lists, where omitting them is an outage.
+roles:
+  realm:
+    - name: laitto-admin
+      description: Laitto platform administrator. Grants access to platform-wide settings such as the mobile app version floor.
+
 clientScopes:
   - name: brewery-signup
     description: Requested by the founder sign-up link so the brewery-name field is rendered.
